@@ -32,7 +32,7 @@ namespace Posts.Controllers
         }
 
         [HttpGet]
-        public async Task<GetPostModel> GetPost(Guid id)
+        public async Task<IEnumerable<GetPostModel>> GetPost(Guid id)
         {
             var result = await _postService.GetPost(id);
 

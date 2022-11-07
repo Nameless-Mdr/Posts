@@ -33,14 +33,12 @@ namespace DAL.Repositories
             return await _context.Posts.AsNoTracking().ProjectTo<GetPostModel>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
-        public async Task<GetPostModel> GetPost(Guid id)
+        public async Task<IEnumerable<GetPostModel>> GetPost(Guid id)
         {
-            var post = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var comment = await _context.Posts.AsNoTracking().Where(x => x.Id == id)
+                .ProjectTo<GetPostModel>(_mapper.ConfigurationProvider).ToListAsync();
 
-            if (post == null)
-                return new GetPostModel();
-
-            return _mapper.Map<GetPostModel>(post);
+            return comment;
         }
 
         public async Task<bool> DeleteAsync(Guid id)

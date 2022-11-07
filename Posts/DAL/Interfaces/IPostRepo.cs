@@ -8,7 +8,7 @@ namespace DAL.Interfaces
 
         Task<IEnumerable<GetPostModel>> GetAllAsync();
 
-        Task<GetPostModel> GetPost(Guid id);
+        Task<IEnumerable<GetPostModel>> GetPost(Guid id);
 
         Task<bool> DeleteAsync(Guid id);
     }

@@ -38,10 +38,7 @@ namespace DAL.Repositories
             var comment = await _context.Comments.AsNoTracking().Where(x => x.Id == id)
                 .ProjectTo<GetCommentModel>(_mapper.ConfigurationProvider).FirstOrDefaultAsync();
 
-            if (comment == null)
-                return new GetCommentModel();
-
-            return comment;
+            return comment ?? new GetCommentModel();
         }
 
         public async Task<bool> DeleteAsync(Guid id)
