@@ -13,6 +13,12 @@ namespace Posts
                     => m.MapFrom(s => Guid.NewGuid()));
 
             CreateMap<Post, GetPostModel>();
+
+            CreateMap<CreateCommentModel, Comment>()
+                .ForMember(d => d.Id, m
+                    => m.MapFrom(s => Guid.NewGuid()));
+
+            CreateMap<Comment, GetCommentModel>();
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿namespace Domain.Entity
 {
-    public class Post
+    public class Comment
     {
         public Guid Id { get; set; }
 
         public string Text { get; set; } = null!;
 
-        public virtual Comment? Comment { get; set; }
+        public Guid PostId { get; set; }
+
+        public virtual Post Post { get; set; } = null!;
     }
 }

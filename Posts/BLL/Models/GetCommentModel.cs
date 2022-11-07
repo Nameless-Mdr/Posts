@@ -1,9 +1,9 @@
 ﻿namespace BLL.Models
 {
-    public class GetPostModel
+    public class GetCommentModel
     {
         public string Text { get; set; } = null!;
 
-        public string? CommentText { get; set; }
+        public string PostText { get; set; } = null!;
     }
 }
