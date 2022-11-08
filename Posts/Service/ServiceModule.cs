@@ -18,6 +18,10 @@ namespace Service
             services.AddTransient<ICommentRepo, CommentRepo>();
 
             services.AddTransient<ICommentService, CommentService>();
+
+            services.AddTransient<IAttachRepo, AttachRepo>();
+
+            services.AddTransient<IAttachService, AttachService>();
         }
     }
 }

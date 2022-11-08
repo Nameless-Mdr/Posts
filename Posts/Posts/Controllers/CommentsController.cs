@@ -15,14 +15,16 @@ namespace Posts.Controllers
             _commentService = commentService;
         }
 
+        // Метод добавления комментария
         [HttpPost]
-        public async Task<Guid> InsertComment(CreateCommentModel model)
+        public async Task<Guid> InsertComment([FromForm] CreateCommentModel model)
         {
             var result = await _commentService.InsertAsync(model);
 
             return result;
         }
 
+        // Метод вывода всех комментариев
         [HttpGet]
         public async Task<IEnumerable<GetCommentModel>> GetAllComments()
         {
@@ -31,6 +33,7 @@ namespace Posts.Controllers
             return result;
         }
 
+        // Метод вывода комментария по id
         [HttpGet]
         public async Task<GetCommentModel> GetComment(Guid id)
         {
@@ -39,6 +42,7 @@ namespace Posts.Controllers
             return result;
         }
 
+        // Метод удаления комментария по id
         [HttpDelete]
         public async Task<bool> DeleteComment(Guid id)
         {

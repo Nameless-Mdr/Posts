@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BLL.Models;
 using Domain.Entity;
+using Domain.Entity.Attach;
 
 namespace Posts
 {
@@ -19,6 +20,12 @@ namespace Posts
                     => m.MapFrom(s => Guid.NewGuid()));
 
             CreateMap<Comment, GetCommentModel>();
+
+            CreateMap<Comment, CommentTextModel>();
+
+            CreateMap<Attach, AttachPathModel>();
+
+            CreateMap<Attach, GetAttachModel>();
         }
     }
 }
