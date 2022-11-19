@@ -1,4 +1,4 @@
-﻿using BLL.Models;
+﻿using BLL.Models.Attach;
 
 namespace DAL.Interfaces
 {

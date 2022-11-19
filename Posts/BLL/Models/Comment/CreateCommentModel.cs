@@ -1,4 +1,4 @@
-﻿namespace BLL.Models
+﻿namespace BLL.Models.Comment
 {
     public class CreateCommentModel
     {

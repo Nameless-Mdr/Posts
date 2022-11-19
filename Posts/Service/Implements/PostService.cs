@@ -1,4 +1,4 @@
-﻿using BLL.Models;
+﻿using BLL.Models.Post;
 using DAL.Interfaces;
 using Domain.Entity.Attach;
 using Service.Interfaces;

@@ -22,6 +22,10 @@ namespace DAL
                 .HasMany(p => p.Attaches)
                 .WithOne(a => a.Post)
                 .HasForeignKey(f => f.PostId);
+
+            modelBuilder.Entity<User>()
+                .HasIndex(f => f.Email)
+                .IsUnique();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -34,5 +38,7 @@ namespace DAL
         public DbSet<Comment> Comments => Set<Comment>();
 
         public DbSet<Attach> Attaches => Set<Attach>();
+
+        public DbSet<User> Users => Set<User>();
     }
 }

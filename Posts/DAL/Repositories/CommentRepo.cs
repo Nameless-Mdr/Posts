@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using BLL.Models;
+using BLL.Models.Comment;
 using DAL.Interfaces;
 using Domain.Entity;
 using Microsoft.EntityFrameworkCore;
@@ -35,10 +35,9 @@ namespace DAL.Repositories
 
         public async Task<GetCommentModel> GetComment(Guid id)
         {
-            var comment = await _context.Comments.AsNoTracking().Where(x => x.Id == id)
-                .ProjectTo<GetCommentModel>(_mapper.ConfigurationProvider).FirstOrDefaultAsync();
+            var comment = await _context.Comments.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
-            return comment ?? new GetCommentModel();
+            return _mapper.Map<GetCommentModel>(comment) ?? new GetCommentModel();
         }
 
         public async Task<bool> DeleteAsync(Guid id)

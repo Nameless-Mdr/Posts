@@ -11,14 +11,22 @@ namespace Service
     {
         public void Registry(IServiceCollection services)
         {
+            // Сервис пользователя
+            services.AddTransient<IUserRepo, UserRepo>();
+
+            services.AddTransient<IUserService, UserService>();
+
+            // Сервис поста
             services.AddTransient<IPostRepo, PostRepo>();
 
             services.AddTransient<IPostService, PostService>();
 
+            // Сервис комментария
             services.AddTransient<ICommentRepo, CommentRepo>();
 
             services.AddTransient<ICommentService, CommentService>();
 
+            // Сервис файлов
             services.AddTransient<IAttachRepo, AttachRepo>();
 
             services.AddTransient<IAttachService, AttachService>();

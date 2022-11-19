@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace BLL.Models
+namespace BLL.Models.Post
 {
     public class CreatePostModel
     {

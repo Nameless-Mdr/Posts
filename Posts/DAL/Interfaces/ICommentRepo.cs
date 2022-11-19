@@ -1,4 +1,4 @@
-﻿using BLL.Models;
+﻿using BLL.Models.Comment;
 using Domain.Entity;
 
 namespace DAL.Interfaces

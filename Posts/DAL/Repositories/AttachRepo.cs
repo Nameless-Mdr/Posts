@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using BLL.Models;
+using BLL.Models.Attach;
 using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,4 +1,4 @@
-﻿using BLL.Models;
+﻿using BLL.Models.Comment;
 
 namespace Service.Interfaces
 {

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using BLL.Models;
+using BLL.Models.Post;
 using DAL.Interfaces;
 using Domain.Entity;
 using Domain.Entity.Attach;
@@ -23,7 +23,6 @@ namespace DAL.Repositories
         public async Task<Guid> InsertAsync(CreatePostModel entity, Dictionary<string, MetaDataModel> files)
         {
             var dbPost = _mapper.Map<Post>(entity);
-            await _context.Posts.AddAsync(dbPost);
 
             foreach (var meta in files)
             {
@@ -40,6 +39,7 @@ namespace DAL.Repositories
                 await _context.Attaches.AddAsync(attach);
             }
 
+            await _context.Posts.AddAsync(dbPost);
             await _context.SaveChangesAsync();
 
             return dbPost.Id;
@@ -52,10 +52,9 @@ namespace DAL.Repositories
 
         public async Task<GetPostModel> GetPost(Guid id)
         {
-            var comment = await _context.Posts.AsNoTracking().Where(x => x.Id == id)
-                .ProjectTo<GetPostModel>(_mapper.ConfigurationProvider).FirstOrDefaultAsync();
+           var post = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
-            return comment ?? new GetPostModel();
+            return _mapper.Map<GetPostModel>(post) ?? new GetPostModel();
         }
 
         public async Task<bool> DeleteAsync(Guid id)

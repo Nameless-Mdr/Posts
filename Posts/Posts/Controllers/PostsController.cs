@@ -1,4 +1,4 @@
-﻿using BLL.Models;
+﻿using BLL.Models.Post;
 using Domain.Entity.Attach;
 using Microsoft.AspNetCore.Mvc;
 using Posts.Migrations;
