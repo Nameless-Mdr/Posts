@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using BLL.Models;
 using DAL.Interfaces;
 using Domain.Entity;
+using Domain.Entity.Attach;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories
@@ -19,10 +20,26 @@ namespace DAL.Repositories
             _context = context;
         }
 
-        public async Task<Guid> InsertAsync(CreatePostModel entity)
+        public async Task<Guid> InsertAsync(CreatePostModel entity, Dictionary<string, MetaDataModel> files)
         {
             var dbPost = _mapper.Map<Post>(entity);
             await _context.Posts.AddAsync(dbPost);
+
+            foreach (var meta in files)
+            {
+                var attach = new Attach()
+                {
+                    Id = Guid.NewGuid(),
+                    Name = meta.Value.Name,
+                    MimeType = meta.Value.MimeType,
+                    FilePath = meta.Key,
+                    Size = meta.Value.Size,
+                    Post = dbPost,
+                };
+
+                await _context.Attaches.AddAsync(attach);
+            }
+
             await _context.SaveChangesAsync();
 
             return dbPost.Id;
@@ -33,12 +50,12 @@ namespace DAL.Repositories
             return await _context.Posts.AsNoTracking().ProjectTo<GetPostModel>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
-        public async Task<IEnumerable<GetPostModel>> GetPost(Guid id)
+        public async Task<GetPostModel> GetPost(Guid id)
         {
             var comment = await _context.Posts.AsNoTracking().Where(x => x.Id == id)
-                .ProjectTo<GetPostModel>(_mapper.ConfigurationProvider).ToListAsync();
+                .ProjectTo<GetPostModel>(_mapper.ConfigurationProvider).FirstOrDefaultAsync();
 
-            return comment;
+            return comment ?? new GetPostModel();
         }
 
         public async Task<bool> DeleteAsync(Guid id)

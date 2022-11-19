@@ -1,5 +1,6 @@
 ﻿using BLL.Models;
 using DAL.Interfaces;
+using Domain.Entity.Attach;
 using Service.Interfaces;
 
 namespace Service.Implements
@@ -13,9 +14,9 @@ namespace Service.Implements
             _postRepo = postRepo;
         }
 
-        public async Task<Guid> InsertAsync(CreatePostModel entity)
+        public async Task<Guid> InsertAsync(CreatePostModel entity, Dictionary<string, MetaDataModel> files)
         {
-            var response = await _postRepo.InsertAsync(entity);
+            var response = await _postRepo.InsertAsync(entity, files);
 
             return response;
         }
@@ -27,7 +28,7 @@ namespace Service.Implements
             return response;
         }
 
-        public async Task<IEnumerable<GetPostModel>> GetPost(Guid id)
+        public async Task<GetPostModel> GetPost(Guid id)
         {
             var response = await _postRepo.GetPost(id);
 

@@ -6,6 +6,8 @@
 
         public string Text { get; set; } = null!;
 
-        public virtual Comment? Comment { get; set; }
+        public virtual ICollection<Comment>? Comments { get; set; }
+
+        public virtual ICollection<Attach.Attach>? Attaches { get; set; }
     }
 }

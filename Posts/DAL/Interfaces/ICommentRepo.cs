@@ -1,4 +1,5 @@
 ﻿using BLL.Models;
+using Domain.Entity;
 
 namespace DAL.Interfaces
 {
