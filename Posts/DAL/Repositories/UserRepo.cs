@@ -35,7 +35,7 @@ namespace DAL.Repositories
             return await _context.Users.AsNoTracking().ProjectTo<GetUserModel>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
-        public async Task<User> GetUserByEmail(string login, string password)
+        public async Task<User> GetUserByCredentials(string login, string password)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == login.ToLower());
 
@@ -44,6 +44,16 @@ namespace DAL.Repositories
 
             if (!HashHelper.Verify(password, user.PasswordHash))
                 throw new Exception("password is incorrect");
+
+            return user;
+        }
+
+        public async Task<User> GetUserById(Guid id)
+        {
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user == null)
+                throw new Exception("user not found");
 
             return user;
         }

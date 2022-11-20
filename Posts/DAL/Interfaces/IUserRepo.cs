@@ -9,6 +9,8 @@ namespace DAL.Interfaces
 
         public Task<IEnumerable<GetUserModel>> GetUsers();
 
-        public Task<User> GetUserByEmail(string login, string password);
+        public Task<User> GetUserByCredentials(string login, string password);
+
+        public Task<User> GetUserById(Guid id);
     }
 }

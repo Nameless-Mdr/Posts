@@ -8,17 +8,25 @@ namespace Posts.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
 
-        public AuthController(IUserService userService)
+        public AuthController(IAuthService authService)
         {
-            _userService = userService;
+            _authService = authService;
         }
 
         [HttpPost]
         public async Task<TokenModel> Token(TokenRequestModel model)
         {
-            var result = await _userService.GetToken(model.Login, model.Password);
+            var result = await _authService.GetToken(model.Login, model.Password);
+
+            return result;
+        }
+
+        [HttpPost]
+        public async Task<TokenModel> RefreshToken(RefreshTokenRequestModel model)
+        {
+            var result = await _authService.GetTokenByRefreshToken(model.RefreshToken);
 
             return result;
         }

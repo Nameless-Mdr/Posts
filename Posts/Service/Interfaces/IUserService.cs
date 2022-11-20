@@ -8,7 +8,5 @@ namespace Service.Interfaces
         public Task<Guid> Insert(CreateUserModel model);
 
         public Task<IEnumerable<GetUserModel>> GetUsers();
-
-        public Task<TokenModel> GetToken(string login, string password);
     }
 }

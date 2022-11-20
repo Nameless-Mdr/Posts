@@ -30,6 +30,9 @@ namespace Service
             services.AddTransient<IAttachRepo, AttachRepo>();
 
             services.AddTransient<IAttachService, AttachService>();
+
+            // Сервис auth
+            services.AddTransient<IAuthService, AuthService>();
         }
     }
 }
