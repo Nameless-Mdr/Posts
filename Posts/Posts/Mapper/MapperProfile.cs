@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using BLL.Models;
 using BLL.Models.Attach;
 using BLL.Models.Comment;
 using BLL.Models.Post;

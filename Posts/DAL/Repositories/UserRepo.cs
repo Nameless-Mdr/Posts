@@ -57,5 +57,15 @@ namespace DAL.Repositories
 
             return user;
         }
+
+        public async Task<GetUserModel> GetUserModelById(Guid id)
+        {
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+
+            if (user == null)
+                throw new Exception("user not found");
+
+            return _mapper.Map<GetUserModel>(user);
+        }
     }
 }

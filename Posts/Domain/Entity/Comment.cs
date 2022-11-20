@@ -8,6 +8,10 @@
 
         public DateTimeOffset DateCreated { get; set; }
 
+        public Guid AuthorId { get; set; }
+
+        public User.User Author { get; set; } = null!;
+
         public Guid PostId { get; set; }
 
         public virtual Post Post { get; set; } = null!;

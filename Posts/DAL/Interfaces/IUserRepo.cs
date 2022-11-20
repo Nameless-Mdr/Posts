@@ -11,6 +11,6 @@ namespace DAL.Interfaces
 
         public Task<User> GetUserByCredentials(string login, string password);
 
-        public Task<User> GetUserById(Guid id);
+        public Task<GetUserModel> GetUserModelById(Guid id);
     }
 }

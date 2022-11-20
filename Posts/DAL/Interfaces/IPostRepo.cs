@@ -5,7 +5,7 @@ namespace DAL.Interfaces
 {
     public interface IPostRepo
     {
-        Task<Guid> InsertAsync(CreatePostModel entity, Dictionary<string, MetaDataModel> files);
+        Task<Guid> InsertAsync(CreatePostModel entity);
 
         Task<IEnumerable<GetPostModel>> GetAllAsync();
 

@@ -1,34 +1,51 @@
 ﻿using BLL.Models.Post;
+using Common;
+using Common.Const;
 using Domain.Entity.Attach;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Posts.Migrations;
 using Service.Interfaces;
-using System.IO;
 
 namespace Posts.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize]
     public class PostsController : ControllerBase
     {
         private readonly IPostService _postService;
 
-        public PostsController(IPostService postService)
+        private readonly IAttachService _attachService;
+
+        public PostsController(IPostService postService, IAttachService attachService)
         {
             _postService = postService;
+            _attachService = attachService;
         }
 
         // Метод добавления поста вместе с файлами
         [HttpPost]
         public async Task<Guid> InsertPost([FromForm] CreatePostModel model)
         {
-            var resDict = new Dictionary<string, MetaDataModel>();
+            if (!model.AuthorId.HasValue)
+            {
+                var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
+
+                if (userId == default)
+                    throw new Exception("you are not authorized");
+
+                model.AuthorId = userId;
+            }
+
+            var result = await _postService.InsertPost(model);
 
             if (model.Files != null)
             {
                 foreach (var file in model.Files)
                 {
                     var meta = await UploadFile(file);
+
+                    meta.PostId = result;
 
                     var tempFi = new FileInfo(Path.Combine(Path.GetTempPath(), meta.TempId.ToString()));
 
@@ -41,11 +58,9 @@ namespace Posts.Controllers
 
                     System.IO.File.Copy(tempFi.FullName, path, true);
 
-                    resDict.Add(path, meta);
+                    await _attachService.InsertAttach(meta, path);
                 }
             }
-
-            var result = await _postService.InsertAsync(model, resDict);
 
             return result;
         }

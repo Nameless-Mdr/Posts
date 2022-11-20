@@ -14,9 +14,9 @@ namespace Service.Implements
             _postRepo = postRepo;
         }
 
-        public async Task<Guid> InsertAsync(CreatePostModel entity, Dictionary<string, MetaDataModel> files)
+        public async Task<Guid> InsertPost(CreatePostModel entity)
         {
-            var response = await _postRepo.InsertAsync(entity, files);
+            var response = await _postRepo.InsertAsync(entity);
 
             return response;
         }

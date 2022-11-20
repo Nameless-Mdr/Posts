@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Posts.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221119201216_user")]
-    partial class user
+    [Migration("20221120144742_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -61,6 +61,9 @@ namespace Posts.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset>("DateCreated")
                         .HasColumnType("timestamp with time zone");
 
@@ -73,6 +76,8 @@ namespace Posts.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AuthorId");
+
                     b.HasIndex("PostId");
 
                     b.ToTable("Comments");
@@ -84,6 +89,9 @@ namespace Posts.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset>("DateCreated")
                         .HasColumnType("timestamp with time zone");
 
@@ -93,10 +101,12 @@ namespace Posts.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AuthorId");
+
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("Domain.Entity.User", b =>
+            modelBuilder.Entity("Domain.Entity.User.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -129,6 +139,43 @@ namespace Posts.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Domain.Entity.User.UserSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("RefreshToken")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSessions");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Attach.Avatar", b =>
+                {
+                    b.HasBaseType("Domain.Entity.Attach.Attach");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Avatars", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entity.Attach.Attach", b =>
                 {
                     b.HasOne("Domain.Entity.Post", "Post")
@@ -142,13 +189,60 @@ namespace Posts.Migrations
 
             modelBuilder.Entity("Domain.Entity.Comment", b =>
                 {
+                    b.HasOne("Domain.Entity.User.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entity.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Author");
+
                     b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Post", b =>
+                {
+                    b.HasOne("Domain.Entity.User.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("Domain.Entity.User.UserSession", b =>
+                {
+                    b.HasOne("Domain.Entity.User.User", "User")
+                        .WithMany("Sessions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Attach.Avatar", b =>
+                {
+                    b.HasOne("Domain.Entity.Attach.Attach", null)
+                        .WithOne()
+                        .HasForeignKey("Domain.Entity.Attach.Avatar", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entity.User.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Domain.Entity.Post", b =>
@@ -156,6 +250,11 @@ namespace Posts.Migrations
                     b.Navigation("Attaches");
 
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Domain.Entity.User.User", b =>
+                {
+                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }

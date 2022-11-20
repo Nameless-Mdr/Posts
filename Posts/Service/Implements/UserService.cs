@@ -1,11 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using BLL.Models.Token;
-using BLL.Models.User;
-using Config.Configs;
+﻿using BLL.Models.User;
 using DAL.Interfaces;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Service.Interfaces;
 
 namespace Service.Implements
@@ -29,6 +23,13 @@ namespace Service.Implements
         public async Task<IEnumerable<GetUserModel>> GetUsers()
         {
             var response = await _userRepo.GetUsers();
+
+            return response;
+        }
+
+        public async Task<GetUserModel> GetUserModelById(Guid id)
+        {
+            var response = await _userRepo.GetUserModelById(id);
 
             return response;
         }

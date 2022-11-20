@@ -3,7 +3,6 @@ using AutoMapper.QueryableExtensions;
 using BLL.Models.Post;
 using DAL.Interfaces;
 using Domain.Entity;
-using Domain.Entity.Attach;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories
@@ -20,24 +19,9 @@ namespace DAL.Repositories
             _context = context;
         }
 
-        public async Task<Guid> InsertAsync(CreatePostModel entity, Dictionary<string, MetaDataModel> files)
+        public async Task<Guid> InsertAsync(CreatePostModel entity)
         {
             var dbPost = _mapper.Map<Post>(entity);
-
-            foreach (var meta in files)
-            {
-                var attach = new Attach()
-                {
-                    Id = Guid.NewGuid(),
-                    Name = meta.Value.Name,
-                    MimeType = meta.Value.MimeType,
-                    FilePath = meta.Key,
-                    Size = meta.Value.Size,
-                    Post = dbPost,
-                };
-
-                await _context.Attaches.AddAsync(attach);
-            }
 
             await _context.Posts.AddAsync(dbPost);
             await _context.SaveChangesAsync();

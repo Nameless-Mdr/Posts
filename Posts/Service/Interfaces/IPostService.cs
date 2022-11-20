@@ -5,7 +5,7 @@ namespace Service.Interfaces
 {
     public interface IPostService
     {
-        Task<Guid> InsertAsync(CreatePostModel entity, Dictionary<string, MetaDataModel> files);
+        Task<Guid> InsertPost(CreatePostModel entity);
 
         Task<IEnumerable<GetPostModel>> GetAllAsync();
 
