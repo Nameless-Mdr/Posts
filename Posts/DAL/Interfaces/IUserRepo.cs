@@ -1,5 +1,5 @@
 ﻿using BLL.Models.User;
-using Domain.Entity;
+using Domain.Entity.User;
 
 namespace DAL.Interfaces
 {

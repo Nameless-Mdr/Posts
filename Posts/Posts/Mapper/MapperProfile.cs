@@ -7,6 +7,7 @@ using BLL.Models.User;
 using Common;
 using Domain.Entity;
 using Domain.Entity.Attach;
+using Domain.Entity.User;
 
 namespace Posts.Mapper
 {
@@ -34,7 +35,9 @@ namespace Posts.Mapper
 
             CreateMap<Post, GetPostModel>()
                 .ForMember(d => d.Attaches, m 
-                    => m.MapFrom(d => d.Attaches));
+                    => m.MapFrom(d => d.Attaches))
+                .ForMember(d => d.Comments, m
+                    => m.MapFrom(d => d.Comments));
 
             // Мапинг модели комментария
             CreateMap<CreateCommentModel, Comment>()

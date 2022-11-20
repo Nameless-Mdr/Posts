@@ -1,5 +1,4 @@
 ﻿using BLL.Models.Token;
-using Domain.Entity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -7,6 +6,7 @@ using Config.Configs;
 using DAL.Interfaces;
 using Microsoft.Extensions.Options;
 using Service.Interfaces;
+using Domain.Entity.User;
 
 namespace Service.Implements
 {
@@ -16,15 +16,21 @@ namespace Service.Implements
 
         private readonly IUserRepo _userRepo;
 
-        public AuthService(IOptions<AuthConfig> authConfig, IUserRepo userRepo)
+        private readonly ISessionRepo _sessionRepo;
+
+        public AuthService(IOptions<AuthConfig> authConfig, IUserRepo userRepo, ISessionRepo sessionRepo)
         {
             _authConfig = authConfig.Value;
             _userRepo = userRepo;
+            _sessionRepo = sessionRepo;
         }
 
-        private TokenModel GenerateTokens(User user)
+        private TokenModel GenerateTokens(UserSession session)
         {
             var dateNow = DateTime.Now;
+
+            if (session == null)
+                throw new Exception("session not found");
 
             var jwt = new JwtSecurityToken(
                 issuer: _authConfig.Issuer,
@@ -32,8 +38,9 @@ namespace Service.Implements
                 notBefore: dateNow,
                 claims: new Claim[]
                 {
-                    new("displayName", user.FirstName),
-                    new("id", user.Id.ToString())
+                    new("displayName", session.User.FirstName),
+                    new("sessionId", session.Id.ToString()),
+                    new("id", session.User.Id.ToString())
                 },
                 expires: dateNow.AddMinutes(_authConfig.LifeTime),
                 signingCredentials: new SigningCredentials(_authConfig.SymmetricSecurityKey(), SecurityAlgorithms.HmacSha256)
@@ -45,7 +52,7 @@ namespace Service.Implements
                 notBefore: dateNow,
                 claims: new Claim[]
                 {
-                    new("id", user.Id.ToString())
+                    new("refreshToken", session.RefreshToken.ToString())
                 },
                 expires: dateNow.AddMinutes(_authConfig.LifeTime),
                 signingCredentials: new SigningCredentials(_authConfig.SymmetricSecurityKey(), SecurityAlgorithms.HmacSha256)
@@ -60,7 +67,18 @@ namespace Service.Implements
         {
             var user = await _userRepo.GetUserByCredentials(login, password);
 
-            return GenerateTokens(user);
+            var session = new UserSession
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                RefreshToken = Guid.NewGuid(),
+                Created = DateTimeOffset.UtcNow,
+                User = user
+            };
+
+            await _sessionRepo.InsertSession(session);
+
+            return GenerateTokens(session);
         }
 
         public async Task<TokenModel> GetTokenByRefreshToken(string refreshToken)
@@ -83,12 +101,17 @@ namespace Service.Implements
                 throw new SecurityTokenException("invalid token");
             }
 
-            if (principal.Claims.FirstOrDefault(x => x.Type == "id")?.Value is String userIdString &&
-                Guid.TryParse(userIdString, out var userId))
+            if (principal.Claims.FirstOrDefault(x => x.Type == "refreshToken")?.Value is String refreshString &&
+                Guid.TryParse(refreshString, out var refreshId))
             {
-                var user = await _userRepo.GetUserById(userId);
+                var session = await _sessionRepo.GetSessionByRefreshToken(refreshId);
 
-                return GenerateTokens(user);
+                if (!session.IsActive)
+                {
+                    throw new Exception("session not active");
+                }
+
+                return GenerateTokens(session);
             }
 
             throw new SecurityTokenException("invalid token");

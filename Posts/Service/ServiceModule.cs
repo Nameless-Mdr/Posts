@@ -33,6 +33,11 @@ namespace Service
 
             // Сервис auth
             services.AddTransient<IAuthService, AuthService>();
+
+            // Сервис сессий
+            services.AddTransient<ISessionRepo, SessionRepo>();
+
+            services.AddTransient<ISessionService, SessionService>();
         }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Posts.Mapper;
+using Posts.Middleware;
 using Service;
 
 class Program
@@ -108,6 +109,8 @@ class Program
 
         app.UseAuthentication();
         app.UseAuthorization();
+
+        app.UseTokenValidator();
 
         app.MapControllers();
 

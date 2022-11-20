@@ -3,7 +3,7 @@ using AutoMapper.QueryableExtensions;
 using BLL.Models.User;
 using Common;
 using DAL.Interfaces;
-using Domain.Entity;
+using Domain.Entity.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories

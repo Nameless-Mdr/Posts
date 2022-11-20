@@ -1,5 +1,6 @@
 ﻿using Domain.Entity;
 using Domain.Entity.Attach;
+using Domain.Entity.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL
@@ -40,5 +41,7 @@ namespace DAL
         public DbSet<Attach> Attaches => Set<Attach>();
 
         public DbSet<User> Users => Set<User>();
+
+        public DbSet<UserSession> UserSessions => Set<UserSession>();
     }
 }
