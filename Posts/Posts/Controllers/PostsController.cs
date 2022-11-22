@@ -1,36 +1,52 @@
-﻿using BLL.Models;
-using Domain.Entity.Attach;
+﻿using BLL.Models.Post;
+using Common;
+using Common.Const;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Posts.Migrations;
 using Service.Interfaces;
-using System.IO;
 
 namespace Posts.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize]
     public class PostsController : ControllerBase
     {
         private readonly IPostService _postService;
 
-        public PostsController(IPostService postService)
+        private readonly IAttachService _attachService;
+
+        public PostsController(IPostService postService, IAttachService attachService)
         {
             _postService = postService;
+            _attachService = attachService;
         }
-
-        // Метод добавления поста вместе с файлами
+        
         [HttpPost]
         public async Task<Guid> InsertPost([FromForm] CreatePostModel model)
         {
-            var resDict = new Dictionary<string, MetaDataModel>();
+            if (!model.AuthorId.HasValue)
+            {
+                var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
+
+                if (userId == default)
+                    throw new Exception("you are not authorized");
+
+                model.AuthorId = userId;
+            }
+
+            var postId = await _postService.InsertPost(model);
 
             if (model.Files != null)
             {
                 foreach (var file in model.Files)
                 {
-                    var meta = await UploadFile(file);
+                    var meta = await FileHelper.UploadFile(file);
 
                     var tempFi = new FileInfo(Path.Combine(Path.GetTempPath(), meta.TempId.ToString()));
+
+                    if (!tempFi.Exists)
+                        throw new Exception("file not found");
 
                     var path = Path.Combine(Directory.GetCurrentDirectory(), "attaches", meta.TempId.ToString());
 
@@ -41,16 +57,13 @@ namespace Posts.Controllers
 
                     System.IO.File.Copy(tempFi.FullName, path, true);
 
-                    resDict.Add(path, meta);
+                    await _attachService.InsertContent(meta, path, postId);
                 }
             }
 
-            var result = await _postService.InsertAsync(model, resDict);
-
-            return result;
+            return postId;
         }
-
-        // Метод вывода всех постов
+        
         [HttpGet]
         public async Task<IEnumerable<GetPostModel>> GetAllPosts()
         {
@@ -58,52 +71,18 @@ namespace Posts.Controllers
 
             return result;
         }
-
-        // Метод вывода постов по id
-        [HttpGet]
-        public async Task<GetPostModel> GetPost(Guid id)
-        {
-            var result = await _postService.GetPost(id);
-
-            return result;
-        }
-
-        // Метод удаление поста по id
+        
         [HttpDelete]
         public async Task<bool> DeletePost(Guid id)
         {
-            var result = await _postService.DeleteAsync(id);
+            var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
+
+            if (userId == default)
+                throw new Exception("you are not authorized");
+
+            var result = await _postService.DeleteAsync(id, userId);
 
             return result;
-        }
-
-        private async Task<MetaDataModel> UploadFile(IFormFile file)
-        {
-            var tempPath = Path.GetTempPath();
-
-            var meta = new MetaDataModel
-            {
-                TempId = Guid.NewGuid(),
-                Name = file.FileName,
-                MimeType = file.ContentType,
-                Size = file.Length,
-            };
-
-            var newPath = Path.Combine(tempPath, meta.TempId.ToString());
-
-            var fileInfo = new FileInfo(newPath);
-
-            if (fileInfo.Exists)
-            {
-                throw new Exception("file exist");
-            }
-
-            using (var stream = System.IO.File.Create(newPath))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            return meta;
         }
     }
 }

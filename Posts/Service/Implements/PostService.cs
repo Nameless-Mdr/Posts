@@ -1,4 +1,4 @@
-﻿using BLL.Models;
+﻿using BLL.Models.Post;
 using DAL.Interfaces;
 using Domain.Entity.Attach;
 using Service.Interfaces;
@@ -14,9 +14,9 @@ namespace Service.Implements
             _postRepo = postRepo;
         }
 
-        public async Task<Guid> InsertAsync(CreatePostModel entity, Dictionary<string, MetaDataModel> files)
+        public async Task<Guid> InsertPost(CreatePostModel entity)
         {
-            var response = await _postRepo.InsertAsync(entity, files);
+            var response = await _postRepo.InsertAsync(entity);
 
             return response;
         }
@@ -28,16 +28,9 @@ namespace Service.Implements
             return response;
         }
 
-        public async Task<GetPostModel> GetPost(Guid id)
+        public async Task<bool> DeleteAsync(Guid postId, Guid authorId)
         {
-            var response = await _postRepo.GetPost(id);
-
-            return response;
-        }
-
-        public async Task<bool> DeleteAsync(Guid id)
-        {
-            var response = await _postRepo.DeleteAsync(id);
+            var response = await _postRepo.DeleteAsync(postId, authorId);
 
             return response;
         }

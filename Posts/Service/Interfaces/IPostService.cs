@@ -1,16 +1,13 @@
-﻿using BLL.Models;
-using Domain.Entity.Attach;
+﻿using BLL.Models.Post;
 
 namespace Service.Interfaces
 {
     public interface IPostService
     {
-        Task<Guid> InsertAsync(CreatePostModel entity, Dictionary<string, MetaDataModel> files);
+        Task<Guid> InsertPost(CreatePostModel entity);
 
         Task<IEnumerable<GetPostModel>> GetAllAsync();
 
-        Task<GetPostModel> GetPost(Guid id);
-
-        Task<bool> DeleteAsync(Guid id);
+        Task<bool> DeleteAsync(Guid postId, Guid authorId);
     }
 }

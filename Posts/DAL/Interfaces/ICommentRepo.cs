@@ -1,16 +1,11 @@
-﻿using BLL.Models;
-using Domain.Entity;
+﻿using BLL.Models.Comment;
 
 namespace DAL.Interfaces
 {
     public interface ICommentRepo
     {
-        Task<Guid> InsertAsync(CreateCommentModel entity);
+        Task<Guid> InsertComment(CreateCommentModel entity);
 
-        Task<IEnumerable<GetCommentModel>> GetAllAsync();
-
-        Task<GetCommentModel> GetComment(Guid id);
-
-        Task<bool> DeleteAsync(Guid id);
+        Task<bool> DeleteComment(Guid commentId, Guid authorId);
     }
 }

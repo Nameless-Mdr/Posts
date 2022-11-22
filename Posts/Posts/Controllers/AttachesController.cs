@@ -1,5 +1,4 @@
-﻿using BLL.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 
 namespace Posts.Controllers
@@ -18,14 +17,12 @@ namespace Posts.Controllers
         [HttpGet]
         public async Task<FileStreamResult> GetAttach(string path, bool download = false)
         {
-            var attach = await _attachService.GetAttach(path);
-
-            if (attach.FilePath == null)
-                throw new Exception("Файла с таким путем не существует");
-
             var fs = new FileStream(path, FileMode.Open);
 
+            var attach = await _attachService.GetAttach(fs.Name);
+
             return download ? File(fs, attach.MimeType, attach.Name) : File(fs, attach.MimeType);
+
         }
     }
 }
