@@ -1,5 +1,4 @@
 ﻿using BLL.Models.Post;
-using Domain.Entity.Attach;
 
 namespace DAL.Interfaces
 {
@@ -9,8 +8,6 @@ namespace DAL.Interfaces
 
         Task<IEnumerable<GetPostModel>> GetAllAsync();
 
-        Task<GetPostModel> GetPost(Guid id);
-
-        Task<bool> DeleteAsync(Guid id);
+        Task<bool> DeleteAsync(Guid postId, Guid authorId);
     }
 }

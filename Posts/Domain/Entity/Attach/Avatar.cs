@@ -4,6 +4,6 @@
     {
         public Guid OwnerId { get; set; }
 
-        public virtual User.User Owner { get; set; } = null!;
+        public User.User Owner { get; set; } = null!;
     }
 }

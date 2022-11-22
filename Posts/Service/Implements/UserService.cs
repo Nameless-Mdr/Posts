@@ -15,7 +15,7 @@ namespace Service.Implements
 
         public async Task<Guid> Insert(CreateUserModel model)
         {
-            var response = await _userRepo.Insert(model);
+            var response = await _userRepo.InsertUser(model);
 
             return response;
         }

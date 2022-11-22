@@ -111,6 +111,9 @@ namespace Service.Implements
                     throw new Exception("session not active");
                 }
 
+                session.RefreshToken = Guid.NewGuid();
+                await _sessionRepo.UpdateRefreshToken(session);
+
                 return GenerateTokens(session);
             }
 

@@ -1,7 +1,6 @@
 ﻿using BLL.Models.Post;
 using Common;
 using Common.Const;
-using Domain.Entity.Attach;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
@@ -22,8 +21,7 @@ namespace Posts.Controllers
             _postService = postService;
             _attachService = attachService;
         }
-
-        // Метод добавления поста вместе с файлами
+        
         [HttpPost]
         public async Task<Guid> InsertPost([FromForm] CreatePostModel model)
         {
@@ -37,17 +35,18 @@ namespace Posts.Controllers
                 model.AuthorId = userId;
             }
 
-            var result = await _postService.InsertPost(model);
+            var postId = await _postService.InsertPost(model);
 
             if (model.Files != null)
             {
                 foreach (var file in model.Files)
                 {
-                    var meta = await UploadFile(file);
-
-                    meta.PostId = result;
+                    var meta = await FileHelper.UploadFile(file);
 
                     var tempFi = new FileInfo(Path.Combine(Path.GetTempPath(), meta.TempId.ToString()));
+
+                    if (!tempFi.Exists)
+                        throw new Exception("file not found");
 
                     var path = Path.Combine(Directory.GetCurrentDirectory(), "attaches", meta.TempId.ToString());
 
@@ -58,14 +57,13 @@ namespace Posts.Controllers
 
                     System.IO.File.Copy(tempFi.FullName, path, true);
 
-                    await _attachService.InsertAttach(meta, path);
+                    await _attachService.InsertContent(meta, path, postId);
                 }
             }
 
-            return result;
+            return postId;
         }
-
-        // Метод вывода всех постов
+        
         [HttpGet]
         public async Task<IEnumerable<GetPostModel>> GetAllPosts()
         {
@@ -73,52 +71,18 @@ namespace Posts.Controllers
 
             return result;
         }
-
-        // Метод вывода постов по id
-        [HttpGet]
-        public async Task<GetPostModel> GetPost(Guid id)
-        {
-            var result = await _postService.GetPost(id);
-
-            return result;
-        }
-
-        // Метод удаление поста по id
+        
         [HttpDelete]
         public async Task<bool> DeletePost(Guid id)
         {
-            var result = await _postService.DeleteAsync(id);
+            var userId = User.GetClaimValue<Guid>(ClaimNames.Id);
+
+            if (userId == default)
+                throw new Exception("you are not authorized");
+
+            var result = await _postService.DeleteAsync(id, userId);
 
             return result;
-        }
-
-        private async Task<MetaDataModel> UploadFile(IFormFile file)
-        {
-            var tempPath = Path.GetTempPath();
-
-            var meta = new MetaDataModel
-            {
-                TempId = Guid.NewGuid(),
-                Name = file.FileName,
-                MimeType = file.ContentType,
-                Size = file.Length,
-            };
-
-            var newPath = Path.Combine(tempPath, meta.TempId.ToString());
-
-            var fileInfo = new FileInfo(newPath);
-
-            if (fileInfo.Exists)
-            {
-                throw new Exception("file exist");
-            }
-
-            using (var stream = System.IO.File.Create(newPath))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            return meta;
         }
     }
 }

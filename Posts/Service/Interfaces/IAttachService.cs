@@ -1,5 +1,5 @@
 ﻿using BLL.Models.Attach;
-using Domain.Entity.Attach;
+using Domain.Entity.MetaData;
 
 namespace Service.Interfaces
 {
@@ -7,6 +7,12 @@ namespace Service.Interfaces
     {
         Task<GetAttachModel> GetAttach(string path);
 
-        Task<Guid> InsertAttach (MetaDataModel meta, string path);
+        Task<Guid> InsertContent(MetaDataModel meta, string path, Guid postId);
+
+        Task<Guid> InsertAvatar(MetaDataModel meta, string path, Guid ownerId);
+
+        Task<Guid> UpdateAvatar(MetaDataModel meta, string path, Guid ownerId);
+
+        Task<bool> UserExists(Guid userId);
     }
 }

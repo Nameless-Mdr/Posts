@@ -13,30 +13,16 @@ namespace Service.Implements
             _commentRepo = commentRepo;
         }
 
-        public async Task<Guid> InsertAsync(CreateCommentModel entity)
+        public async Task<Guid> InsertComment(CreateCommentModel entity)
         {
-            var response = await _commentRepo.InsertAsync(entity);
+            var response = await _commentRepo.InsertComment(entity);
 
             return response;
         }
 
-        public async Task<IEnumerable<GetCommentModel>> GetAllAsync()
+        public async Task<bool> DeleteComment(Guid commentId, Guid authorId)
         {
-            var response = await _commentRepo.GetAllAsync();
-
-            return response;
-        }
-
-        public async Task<GetCommentModel> GetComment(Guid id)
-        {
-            var response = await _commentRepo.GetComment(id);
-
-            return response;
-        }
-
-        public async Task<bool> DeleteAsync(Guid id)
-        {
-            var response = await _commentRepo.DeleteAsync(id);
+            var response = await _commentRepo.DeleteComment(commentId, authorId);
 
             return response;
         }

@@ -20,7 +20,7 @@ namespace DAL.Repositories
             _context = context;
         }
 
-        public async Task<Guid> Insert(CreateUserModel model)
+        public async Task<Guid> InsertUser(CreateUserModel model)
         {
             var dbUser = _mapper.Map<User>(model);
 
@@ -48,24 +48,14 @@ namespace DAL.Repositories
             return user;
         }
 
-        public async Task<User> GetUserById(Guid id)
+        public async Task<GetUserModel> GetUserModelById(Guid id)
         {
-            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var user = await _context.Users.AsNoTracking().Where(x => x.Id == id).ProjectTo<GetUserModel>(_mapper.ConfigurationProvider).FirstOrDefaultAsync();
 
             if (user == null)
                 throw new Exception("user not found");
 
             return user;
-        }
-
-        public async Task<GetUserModel> GetUserModelById(Guid id)
-        {
-            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-
-            if (user == null)
-                throw new Exception("user not found");
-
-            return _mapper.Map<GetUserModel>(user);
         }
     }
 }

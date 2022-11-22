@@ -1,4 +1,4 @@
-﻿namespace Domain.Entity.Attach
+﻿namespace Domain.Entity.MetaData
 {
     public class MetaDataModel
     {
@@ -9,7 +9,5 @@
         public string MimeType { get; set; } = null!;
 
         public long Size { get; set; }
-
-        public Guid PostId { get; set; }
     }
 }

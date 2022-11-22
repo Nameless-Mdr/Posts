@@ -38,7 +38,8 @@ namespace DAL.Repositories
 
         public async Task<UserSession> GetSessionByRefreshToken(Guid refreshToken)
         {
-            var session = await _context.UserSessions.Include(x => x.User).FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
+            var session = await _context.UserSessions.Include(x 
+                => x.User).FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
 
             if (session == null)
                 throw new Exception("session is not found");

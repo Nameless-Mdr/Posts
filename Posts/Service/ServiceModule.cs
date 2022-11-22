@@ -38,6 +38,11 @@ namespace Service
             services.AddTransient<ISessionRepo, SessionRepo>();
 
             services.AddTransient<ISessionService, SessionService>();
+
+            // Сервис лайков
+            services.AddTransient<ILikeRepo, LikeRepo>();
+
+            services.AddTransient<ILikeService, LikeService>();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Domain.Entity.User
+﻿using Domain.Entity.Attach;
+
+namespace Domain.Entity.User
 {
     public class User
     {
@@ -14,6 +16,11 @@
 
         public DateTimeOffset BirthDate { get; set; }
 
+
         public virtual ICollection<UserSession>? Sessions { get; set; }
+
+        public virtual ICollection<Post>? Posts { get; set; }
+
+        public virtual Avatar? Avatar { get; set; }
     }
 }

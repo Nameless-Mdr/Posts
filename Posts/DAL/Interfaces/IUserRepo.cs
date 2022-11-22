@@ -5,7 +5,7 @@ namespace DAL.Interfaces
 {
     public interface IUserRepo
     {
-        public Task<Guid> Insert(CreateUserModel model);
+        public Task<Guid> InsertUser(CreateUserModel model);
 
         public Task<IEnumerable<GetUserModel>> GetUsers();
 

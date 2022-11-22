@@ -40,15 +40,10 @@ namespace Posts.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("uuid");
-
                     b.Property<long?>("Size")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PostId");
 
                     b.ToTable("Attaches");
                 });
@@ -79,6 +74,31 @@ namespace Posts.Migrations
                     b.HasIndex("PostId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Like", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("DateCreated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("AuthorId", "PostId")
+                        .IsUnique();
+
+                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("Domain.Entity.Post", b =>
@@ -169,20 +189,22 @@ namespace Posts.Migrations
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 
-                    b.HasIndex("OwnerId");
+                    b.HasIndex("OwnerId")
+                        .IsUnique();
 
                     b.ToTable("Avatars", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entity.Attach.Attach", b =>
+            modelBuilder.Entity("Domain.Entity.Attach.Content", b =>
                 {
-                    b.HasOne("Domain.Entity.Post", "Post")
-                        .WithMany("Attaches")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasBaseType("Domain.Entity.Attach.Attach");
 
-                    b.Navigation("Post");
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("Contents", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entity.Comment", b =>
@@ -204,10 +226,29 @@ namespace Posts.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("Domain.Entity.Post", b =>
+            modelBuilder.Entity("Domain.Entity.Like", b =>
                 {
                     b.HasOne("Domain.Entity.User.User", "Author")
                         .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entity.Post", "Post")
+                        .WithMany("Likes")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Domain.Entity.Post", b =>
+                {
+                    b.HasOne("Domain.Entity.User.User", "Author")
+                        .WithMany("Posts")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -235,23 +276,46 @@ namespace Posts.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entity.User.User", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
+                        .WithOne("Avatar")
+                        .HasForeignKey("Domain.Entity.Attach.Avatar", "OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Owner");
                 });
 
+            modelBuilder.Entity("Domain.Entity.Attach.Content", b =>
+                {
+                    b.HasOne("Domain.Entity.Attach.Attach", null)
+                        .WithOne()
+                        .HasForeignKey("Domain.Entity.Attach.Content", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entity.Post", "Post")
+                        .WithMany("Contents")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
             modelBuilder.Entity("Domain.Entity.Post", b =>
                 {
-                    b.Navigation("Attaches");
-
                     b.Navigation("Comments");
+
+                    b.Navigation("Contents");
+
+                    b.Navigation("Likes");
                 });
 
             modelBuilder.Entity("Domain.Entity.User.User", b =>
                 {
+                    b.Navigation("Avatar");
+
+                    b.Navigation("Posts");
+
                     b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618

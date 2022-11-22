@@ -1,5 +1,4 @@
-﻿using BLL.Models.Token;
-using BLL.Models.User;
+﻿using BLL.Models.User;
 
 namespace Service.Interfaces
 {

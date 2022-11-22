@@ -12,6 +12,7 @@
 
         public bool IsActive { get; set; } = true;
 
+
         public virtual User User { get; set; } = null!;
     }
 }

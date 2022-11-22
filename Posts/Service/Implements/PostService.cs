@@ -28,16 +28,9 @@ namespace Service.Implements
             return response;
         }
 
-        public async Task<GetPostModel> GetPost(Guid id)
+        public async Task<bool> DeleteAsync(Guid postId, Guid authorId)
         {
-            var response = await _postRepo.GetPost(id);
-
-            return response;
-        }
-
-        public async Task<bool> DeleteAsync(Guid id)
-        {
-            var response = await _postRepo.DeleteAsync(id);
+            var response = await _postRepo.DeleteAsync(postId, authorId);
 
             return response;
         }

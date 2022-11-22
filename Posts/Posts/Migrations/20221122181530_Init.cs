@@ -10,6 +10,21 @@ namespace Posts.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Attaches",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    MimeType = table.Column<string>(type: "text", nullable: false),
+                    FilePath = table.Column<string>(type: "text", nullable: false),
+                    Size = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Attaches", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -23,6 +38,30 @@ namespace Posts.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Avatars",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Avatars", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Avatars_Attaches_Id",
+                        column: x => x.Id,
+                        principalTable: "Attaches",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Avatars_Users_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -67,28 +106,6 @@ namespace Posts.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Attaches",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    MimeType = table.Column<string>(type: "text", nullable: false),
-                    FilePath = table.Column<string>(type: "text", nullable: false),
-                    Size = table.Column<long>(type: "bigint", nullable: true),
-                    PostId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Attaches", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Attaches_Posts_PostId",
-                        column: x => x.PostId,
-                        principalTable: "Posts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Comments",
                 columns: table => new
                 {
@@ -116,38 +133,60 @@ namespace Posts.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Avatars",
+                name: "Contents",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false)
+                    PostId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Avatars", x => x.Id);
+                    table.PrimaryKey("PK_Contents", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Avatars_Attaches_Id",
+                        name: "FK_Contents_Attaches_Id",
                         column: x => x.Id,
                         principalTable: "Attaches",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Avatars_Users_OwnerId",
-                        column: x => x.OwnerId,
+                        name: "FK_Contents_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Likes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DateCreated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    AuthorId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PostId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Likes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Likes_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Likes_Users_AuthorId",
+                        column: x => x.AuthorId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Attaches_PostId",
-                table: "Attaches",
-                column: "PostId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Avatars_OwnerId",
                 table: "Avatars",
-                column: "OwnerId");
+                column: "OwnerId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_AuthorId",
@@ -157,6 +196,22 @@ namespace Posts.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_PostId",
                 table: "Comments",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Contents_PostId",
+                table: "Contents",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Likes_AuthorId_PostId",
+                table: "Likes",
+                columns: new[] { "AuthorId", "PostId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Likes_PostId",
+                table: "Likes",
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
@@ -183,6 +238,12 @@ namespace Posts.Migrations
 
             migrationBuilder.DropTable(
                 name: "Comments");
+
+            migrationBuilder.DropTable(
+                name: "Contents");
+
+            migrationBuilder.DropTable(
+                name: "Likes");
 
             migrationBuilder.DropTable(
                 name: "UserSessions");

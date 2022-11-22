@@ -34,19 +34,15 @@ namespace DAL.Repositories
             return await _context.Posts.AsNoTracking().ProjectTo<GetPostModel>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
-        public async Task<GetPostModel> GetPost(Guid id)
+        public async Task<bool> DeleteAsync(Guid postId, Guid authorId)
         {
-           var post = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (await _context.Posts.AsNoTracking().AnyAsync(x => x.Id == postId && x.AuthorId != authorId))
+                throw new Exception("Not enough rights");
 
-            return _mapper.Map<GetPostModel>(post) ?? new GetPostModel();
-        }
-
-        public async Task<bool> DeleteAsync(Guid id)
-        {
-            var post = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var post = await _context.Posts.AsNoTracking().FirstOrDefaultAsync(x => x.Id == postId);
 
             if (post == null)
-                return false;
+                throw new Exception("Post not found");
 
             _context.Posts.Remove(post);
 

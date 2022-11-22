@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using BLL.Models.Comment;
 using DAL.Interfaces;
 using Domain.Entity;
@@ -19,7 +18,7 @@ namespace DAL.Repositories
             _context = context;
         }
 
-        public async Task<Guid> InsertAsync(CreateCommentModel entity)
+        public async Task<Guid> InsertComment(CreateCommentModel entity)
         {
             var dbComment = _mapper.Map<Comment>(entity);
             await _context.Comments.AddAsync(dbComment);
@@ -28,24 +27,15 @@ namespace DAL.Repositories
             return dbComment.Id;
         }
 
-        public async Task<IEnumerable<GetCommentModel>> GetAllAsync()
+        public async Task<bool> DeleteComment(Guid commentId, Guid authorId)
         {
-            return await _context.Comments.AsNoTracking().ProjectTo<GetCommentModel>(_mapper.ConfigurationProvider).ToListAsync();
-        }
+            if (await _context.Comments.AsNoTracking().AnyAsync(x => x.Id == commentId && x.AuthorId != authorId))
+                throw new Exception("Not enough rights");
 
-        public async Task<GetCommentModel> GetComment(Guid id)
-        {
-            var comment = await _context.Comments.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-
-            return _mapper.Map<GetCommentModel>(comment) ?? new GetCommentModel();
-        }
-
-        public async Task<bool> DeleteAsync(Guid id)
-        {
-            var comment = await _context.Comments.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var comment = await _context.Comments.AsNoTracking().FirstOrDefaultAsync(x => x.Id == commentId);
 
             if (comment == null)
-                return false;
+                throw new Exception("Comment not found");
 
             _context.Comments.Remove(comment);
 

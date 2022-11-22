@@ -14,13 +14,17 @@ namespace DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Avatar>().ToTable(nameof(Avatars));
+
+            modelBuilder.Entity<Content>().ToTable(nameof(Contents));
+
             modelBuilder.Entity<Post>()
                 .HasMany(p => p.Comments)
                 .WithOne(c => c.Post)
                 .HasForeignKey(f => f.PostId);
 
             modelBuilder.Entity<Post>()
-                .HasMany(p => p.Attaches)
+                .HasMany(p => p.Contents)
                 .WithOne(a => a.Post)
                 .HasForeignKey(f => f.PostId);
 
@@ -28,7 +32,10 @@ namespace DAL
                 .HasIndex(f => f.Email)
                 .IsUnique();
 
-            modelBuilder.Entity<Avatar>().ToTable(nameof(Avatars));
+            modelBuilder.Entity<Like>()
+                .HasIndex(f => new { f.AuthorId, f.PostId })
+                .IsUnique();
+
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -47,5 +54,9 @@ namespace DAL
         public DbSet<UserSession> UserSessions => Set<UserSession>();
 
         public DbSet<Avatar> Avatars => Set<Avatar>();
+
+        public DbSet<Content> Contents => Set<Content>();
+
+        public DbSet<Like> Likes => Set<Like>();
     }
 }

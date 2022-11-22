@@ -9,5 +9,9 @@
         public string Email { get; set; } = null!;
 
         public DateTimeOffset BirthDate { get; set; }
+
+        public int CountOfPosts { get; set; }
+
+        public string? AvatarPath { get; set; }
     }
 }

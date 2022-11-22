@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BLL.Models.Attach;
 using BLL.Models.Comment;
+using BLL.Models.Like;
 using BLL.Models.Post;
 using BLL.Models.User;
 using Common;
@@ -23,7 +24,11 @@ namespace Posts.Mapper
                 .ForMember(d => d.BirthDate, m 
                     => m.MapFrom(s => s.BirthDate.UtcDateTime));
 
-            CreateMap<User, GetUserModel>();
+            CreateMap<User, GetUserModel>()
+                .ForMember(d => d.CountOfPosts, m 
+                    => m.MapFrom(s => s.Posts!.Count))
+                .ForMember(d => d.AvatarPath, m 
+                    => m.MapFrom(s => s.Avatar!.FilePath));
 
             // Мапинг модели поста
             CreateMap<CreatePostModel, Post>()
@@ -33,10 +38,12 @@ namespace Posts.Mapper
                     => m.MapFrom(s => DateTimeOffset.UtcNow));
 
             CreateMap<Post, GetPostModel>()
-                .ForMember(d => d.Attaches, m 
-                    => m.MapFrom(d => d.Attaches))
                 .ForMember(d => d.Comments, m
-                    => m.MapFrom(d => d.Comments));
+                    => m.MapFrom(d => d.Comments))
+                .ForMember(d => d.PathContents, m 
+                    => m.MapFrom(s => s.Contents!.Select(x => x.FilePath)))
+                .ForMember(d => d.CountOfLikes, m 
+                    => m.MapFrom(s => s.Likes!.Count));
 
             // Мапинг модели комментария
             CreateMap<CreateCommentModel, Comment>()
@@ -45,14 +52,31 @@ namespace Posts.Mapper
                 .ForMember(d => d.DateCreated, m
                     => m.MapFrom(s => DateTimeOffset.UtcNow));
 
-            CreateMap<Comment, GetCommentModel>();
+            CreateMap<Comment, GetCommentModel>()
+                .ForMember(d => d.PostText, m 
+                    => m.MapFrom(s => s.Text));
 
-            CreateMap<Comment, CommentTextModel>();
+            CreateMap<Comment, CommentModel>()
+                .ForMember(d => d.Text, m
+                    => m.MapFrom(s => s.Text))
+                .ForMember(d => d.FirstName, m
+                    => m.MapFrom(s => s.Author.FirstName))
+                .ForMember(d => d.LastName, m
+                    => m.MapFrom(s => s.Author.LastName))
+                .ForMember(d => d.DateCreated, m 
+                    => m.MapFrom(s => s.DateCreated));
 
             // Мапинг модели файла
-            CreateMap<Attach, AttachPathModel>();
+            CreateMap<Attach, Content>();
 
             CreateMap<Attach, GetAttachModel>();
+
+            // Мапинг модели лайков
+            CreateMap<CreateLikeModel, Like>()
+                .ForMember(d => d.Id, m 
+                    => m.MapFrom(s => Guid.NewGuid()))
+                .ForMember(d => d.DateCreated, m
+                    => m.MapFrom(s => DateTimeOffset.UtcNow));
         }
     }
 }
